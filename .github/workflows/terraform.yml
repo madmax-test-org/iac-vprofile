@@ -9,3 +9,33 @@ on:
     pull_request:
         branches:
             - main
+        paths:
+            - terraform/**
+
+env:
+    AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+    AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+    BUCKET_TF_STATE: ${{secrets.BUCKET_TF_STATE}}
+    AWS_REGION: us-east-1
+    EKS_CLUSTER: vprofile-eks
+
+jobs:
+    terraform:
+        name: "Apply terraform Code changes"
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+             shell: bash
+             working-directory: ./terraform
+
+        steps:
+            - name: Checkout Source code
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform with specified
+              uses: hashicorp/setup-terraform@v3
+
+            - name: Terraform init
+              id: backend-config
+              run: |
+                terraform init -backend-config="${{secrets.BUCKET_TF_STATE}}"
