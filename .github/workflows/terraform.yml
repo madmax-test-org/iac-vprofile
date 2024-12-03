@@ -39,3 +39,12 @@ jobs:
               id: backend-config
               run: |
                 terraform init -backend-config="${{secrets.BUCKET_TF_STATE}}"
+
+            - name: Terraform fmt
+              id: fmt
+              run: terraform fmt -check
+              continue-on-error: true
+
+            - name: Terraform Validate
+              id: validate
+              run: terraform validate -no-color
